@@ -1,0 +1,31 @@
+<body style="background: #000;">
+	<script src="js/quadtree.js"></script>
+	<script src="js/camera.js"></script>
+	<script src="js/entity.js"></script>
+	<script src="js/grid.js"></script>
+	<script src="js/main.js"></script>
+	
+	<style>
+		body{color: #fff;}
+		canvas{display: block; width: 500px; height:300px; margin: 50px auto 10px auto; border: 1px solid #ddd; }
+		.debug{width: 500px;margin:0 auto;}
+		.debug .add{}
+			.debug .add input{width:50px;}
+		#debuBox{display:block; height: 100px; width: 500px; margin:0 auto;}	
+	</style>
+	
+	<canvas width="500" height="300"></canvas>
+	
+	<textarea id="debuBox"></textarea>
+	
+	<div class="debug">
+		<div class="add">
+			<label>Add Block<button id="add">false</button></label><br>
+			<input type="text" id="add-width" placeholder="width" maxlength="3" value="20">
+			<input type="text" id="add-height" placeholder="height" maxlength="3" value="20">
+		</div>
+
+		<label>Draw QuadTree<button id="quadtree">true</button></label><br>
+	</div>
+	
+</body>
