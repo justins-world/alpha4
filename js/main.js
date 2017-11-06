@@ -1,4 +1,3 @@
-/*Continuous Collision Detection*/
 function init(){
 	mouse = {x: 0, y: 0}
 	
@@ -25,42 +24,6 @@ function init(){
 
 function loop(){ update(); render();}
 
-function col(a, b, cam, sides){
-	if (a.x < b.x + b.width+cam.x  &&
-		a.x + a.width > b.x+cam.x  &&
-		a.y < b.y + b.height+cam.y &&
-		a.y + a.height > b.y+cam.y) {
-		
-		if(a.x-b.x < 0){
-			sides.right.canMove = false;
-		}else{
-			sides.left.canMove = false;
-		}
-		if(a.y-b.y < 0){
-			sides.bottom.canMove = false;
-		}else{
-			sides.top.canMove = false;
-		}			
-	} 
-	if (a.x - 12 < b.x + b.width+cam.x  &&
-	    a.x + 12 + a.width > b.x+cam.x  &&
-	    a.y - 12 < b.y + b.height+cam.y &&
-	    a.y + 12 + a.height  > b.y+cam.y){
-		
-		if(a.x - b.x < 0){
-			sides.right.maxMove = Math.ceil(b.x-(a.x+a.width));
-		}else{
-			sides.left.maxMove =  Math.ceil(a.x-(b.x+b.width));  
-		}
-		if(a.y - b.y < 0){
-			sides.bottom.maxMove = Math.ceil(b.y-(a.y+a.height));	
-		}else{
-			sides.top.maxMove = Math.ceil(a.y-(b.y+b.height));		
-		}
-	}
-	   
-	return sides;	
-}
 function update(){
 	player.resetDir();
 
@@ -74,13 +37,14 @@ function update(){
 
 	var ents = quadTree.get(player, cam);
 	
-	for(let i = 0; i < ents.length; i++){
-		col(player, ents[i], cam, player.dir);
-	}
-	
-	debugBox(player.dir.top.maxMove+" | "+player.dir.bottom.maxMove+" | "+player.dir.left.maxMove+" | "+player.dir.right.maxMove,false);
-	debugBox(player.dir.top.canMove+" | "+player.dir.bottom.canMove+" | "+player.dir.left.canMove+" | "+player.dir.right.canMove,true);
-	debugBox("Top | Bottom | Left | Right",true);	
+	for(let i = 0; i < ents.quad.length; i++){ player.col(ents.quad[i], cam); }
+	for(let i = 0; i < ents.parent.length; i++){ player.col(ents.parent[i], cam); }	
+
+	debugBox("Top | Bottom | Left | Right",false);
+	debugBox(player.dir.top.maxMove+" | "+player.dir.bottom.maxMove+" | "+player.dir.left.maxMove+" | "+player.dir.right.maxMove,true);
+	//debugBox(player.dir.top.canMove+" | "+player.dir.bottom.canMove+" | "+player.dir.left.canMove+" | "+player.dir.right.canMove,true);
+	debugBox("Cam.X | Cam.Y ",true);
+	debugBox(cam.x+" | "+cam.y,true);		
 	 
 	if(this.keymap['38']){//up
 		if(player.dir.top.canMove){
@@ -148,11 +112,10 @@ function render(){
 	
 	//draws quad tree
 	if(debug.quadtree){ quadTree.draw(ctx); }	
-	
 }
 
 function getRandomColor(){var letters = '0123456789ABCDEF'; var color = '#'; for (var i = 0; i < 6; i++) { color += letters[Math.floor(Math.random() * 16)]; } return color;}
-function debugBox(text, append=false){document.getElementById('debuBox').value = text+(append? '\n'+document.getElementById('debuBox').value : '');}
+function debugBox(text, append=false){document.getElementById('debuBox').value = (append? document.getElementById('debuBox').value+'\n' : '')+text;}
 function createEvents(){
 	canvas.el.oncontextmenu = function (e) { e.preventDefault(); };
 	window.addEventListener('mousemove', function(e){

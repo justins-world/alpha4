@@ -7,35 +7,39 @@ class quad_tree_obj{
  		this.max_children = max_children;
 		this.depth = depth;
 		this.max_depth = max_depth;
-		this.quads 	= {1:[], 2:[], 3:[], 4:[]};
-		this.ch 	= {1:0,  2:0,  3:0,  4:0};
+		this.quads 	= {1:[], 2:[], 3:[], 4:[], 5:[]};
+		this.ch 	= {1:0, 2:0, 3:0, 4:0, 5:0};
 	}
 	insert(ent, cam){
 		var quad = this.pickQuad(ent, cam);
-
-		if(this.ch[quad] <  this.max_children || this.depth == this.max_depth ){
- 			this.quads[quad].push(ent);
-			this.ch[quad]++;
+		
+		if(quad == 5){
+			this.quads[quad].push(ent);	
 		}else{
-			if(this.quads[ quad ] instanceof quad_tree_obj == false ){
-				var tmpents = this.quads[ quad ];
+			if(this.ch[quad] <  this.max_children || this.depth == this.max_depth ){
+				this.quads[quad].push(ent);
+				this.ch[quad]++;
+			}else{
+				if(this.quads[ quad ] instanceof quad_tree_obj == false ){
+					var tmpents = this.quads[ quad ];
 
-				var tmpCords = this.pickCords( quad );
- 
-				this.quads[ quad ] = new quad_tree_obj(tmpCords.x, tmpCords.y, this.width/2, this.height/2, this.max_children, this.depth+1, this.max_depth);
-				for(var i=0; i<tmpents.length; i++){
-					this.quads[ quad ].insert( tmpents[i], cam);
-				}
-			} 
-			this.quads[ quad ].insert(ent, cam);
+					var tmpCords = this.pickCords( quad );
+	 
+					this.quads[ quad ] = new quad_tree_obj(tmpCords.x, tmpCords.y, this.width/2, this.height/2, this.max_children, this.depth+1, this.max_depth);
+					for(var i=0; i<tmpents.length; i++){
+						this.quads[ quad ].insert( tmpents[i], cam);
+					}
+				} 
+				this.quads[ quad ].insert(ent, cam);
+			}
 		}
 	}
 	get(ent,cam){
 		var quad = this.pickQuad(ent,cam);
 		if(this.quads[ quad ] instanceof quad_tree_obj == true ){
-			return this.quads[ quad ].get(ent,cam);
+			return {quad: this.quads[ quad ].get(ent, cam),parent:this.quads[ 5 ]};
 		}else{
-			return this.quads[ quad ];
+			return {quad:this.quads[ quad ],parent:this.quads[ 5 ]};
 		}
 	}
 	pickCords(quad){
@@ -55,6 +59,10 @@ class quad_tree_obj{
 		}
 	}
 	pickQuad(ent, cam){
+		if(ent.width > this.width/4 || ent.height > this.height/4){
+			return 5; // the ent is to large for the quad
+		}
+		
 		if(ent.x+cam.x < this.x+this.width/2){
 			if(ent.y+cam.y < this.y + this.height/2){
 				return 1;
