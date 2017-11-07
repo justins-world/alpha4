@@ -25,6 +25,7 @@ function init(){
 function loop(){ update(); render();}
 
 function update(){
+
 	player.resetDir();
 
 	cam.updateEye();
@@ -39,14 +40,8 @@ function update(){
 	
 	for(let i = 0; i < ents.quad.length; i++){ player.col(ents.quad[i], cam); }
 	for(let i = 0; i < ents.parent.length; i++){ player.col(ents.parent[i], cam); }	
-
-	debugBox("Top | Bottom | Left | Right",false);
-	debugBox(player.dir.top.maxMove+" | "+player.dir.bottom.maxMove+" | "+player.dir.left.maxMove+" | "+player.dir.right.maxMove,true);
-	//debugBox(player.dir.top.canMove+" | "+player.dir.bottom.canMove+" | "+player.dir.left.canMove+" | "+player.dir.right.canMove,true);
-	debugBox("Cam.X | Cam.Y ",true);
-	debugBox(cam.x+" | "+cam.y,true);		
-	 
-	if(this.keymap['38']){//up
+ 
+	if(keymap['38']){//up
 		if(player.dir.top.canMove){
 			if(player.y <= cam.yMinDist){
 				cam.y+=(player.dir.top.maxMove == -1? player.speed : (player.speed<player.dir.top.maxMove ?  player.speed:player.dir.top.maxMove ));
@@ -54,9 +49,10 @@ function update(){
 				player.y-=(player.dir.top.maxMove == -1? player.speed : (player.speed<player.dir.top.maxMove ?  player.speed:player.dir.top.maxMove ));
 			}
 
-		}	
+		}
+	
 	}
-	if(this.keymap['40']){//down
+	if(keymap['40']){//down
 		if(player.dir.bottom.canMove){	
 			if(player.y+player.height >= cam.yMaxDist){
 				cam.y-=(player.dir.bottom.maxMove== -1? player.speed : (player.speed<player.dir.bottom.maxMove ?  player.speed:player.dir.bottom.maxMove ));
@@ -64,8 +60,18 @@ function update(){
 				player.y+=(player.dir.bottom.maxMove== -1? player.speed : (player.speed<player.dir.bottom.maxMove ?  player.speed:player.dir.bottom.maxMove ));
 			}
 		}
+
 	}
-	if(this.keymap['37']){//left
+	if(keymap['37']){
+		player.acc.x = -0.5
+	}else if(keymap['39']){
+		player.acc.x = 0.5
+	}else{
+		//player.acc.x = player.acc.x * -1;
+		player.vel.x = player.acc.x = 0;
+	}
+	/*
+	if(keymap['37']){//left
 		if(player.dir.left.canMove){
 			if(player.x <= cam.xMinDist){
 				cam.x+=(player.dir.left.maxMove== -1? player.speed : (player.speed<player.dir.left.maxMove ?  player.speed:player.dir.left.maxMove ));
@@ -73,16 +79,35 @@ function update(){
 				player.x-=(player.dir.left.maxMove== -1? player.speed : (player.speed<player.dir.left.maxMove ?  player.speed:player.dir.left.maxMove ));
 			}
 		}	
+
 	}
-	if(this.keymap['39']){//right	
+	if(keymap['39']){//right	
 		if(player.dir.right.canMove){
 			if(player.x+player.width >= cam.xMaxDist){
 				cam.x-=(player.dir.right.maxMove== -1? player.speed : (player.speed<player.dir.right.maxMove ?  player.speed:player.dir.right.maxMove ));
 			}else{
 				player.x+=(player.dir.right.maxMove== -1? player.speed : (player.speed<player.dir.right.maxMove ?  player.speed:player.dir.right.maxMove ));
 			}
-		}	
+		}
+
 	}
+	*/
+	
+	
+	player.vel.x += player.acc.x;
+	player.x += player.vel.x;
+	if(player.vel.x >player.vel.max){player.vel.x = player.vel.max;}
+	if(player.vel.x < -1 * player.vel.max){player.vel.x = -1 * player.vel.max;}
+	
+	debugBox( player.vel.x+" | "+player.acc.x+" | "+player.x,false); 
+	
+	/*
+	debugBox("Top | Bottom | Left | Right",false); 
+	debugBox(player.dir.top.maxMove+" | "+player.dir.bottom.maxMove+" | "+player.dir.left.maxMove+" | "+player.dir.right.maxMove,true);
+	debugBox(player.dir.top.canMove+" | "+player.dir.bottom.canMove+" | "+player.dir.left.canMove+" | "+player.dir.right.canMove,true);
+	debugBox("Cam.X | Cam.Y ",true);
+	debugBox(cam.x+" | "+cam.y,true);		
+	*/
 	
 	requestAnimationFrame(this.loop.bind(this));
 }

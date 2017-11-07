@@ -7,6 +7,11 @@ class entity{
 		this.height = attr.height;
 		this.buffer = 12;//space around the object for collision
 		this.color = attr.color;
+		this.acc = {x:0, y:0}
+		this.vel = {max:10, x:0, y:0}
+ 
+		this.speed = 10;// remove this later when velocity is working
+		
 		this.dir={
 			top:{
 				canMove:true, maxMove:-1
@@ -41,7 +46,7 @@ class entity{
     col(b, cam){
 		/*Continuous Collision Detection*/
 		//TODO: ADD CAM TO X
-		if (this.x < b.x + b.width+cam.x  &&
+ 		if (this.x < b.x + b.width+cam.x  &&
 			this.x + this.width > b.x+cam.x  &&
 			this.y < b.y + b.height+cam.y &&
 			this.y + this.height > b.y+cam.y) {
@@ -51,12 +56,14 @@ class entity{
 			}else{
 				this.dir.left.canMove = false;
 			}
+			
 			if(this.y-b.y-cam.y < 0){
 				this.dir.bottom.canMove = false;
 			}else{
 				this.dir.top.canMove = false;
 			}			
 		} 
+		
 		if (this.x - this.buffer < b.x + b.width+cam.x  &&
 			this.x + this.buffer + this.width > b.x+cam.x  &&
 			this.y - this.buffer < b.y + b.height+cam.y &&
@@ -73,5 +80,6 @@ class entity{
 				this.dir.top.maxMove = Math.ceil(this.y-(b.y+b.height+cam.y));		
 			}
 		}
+ 
 	}	
 }
