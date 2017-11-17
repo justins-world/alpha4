@@ -63,14 +63,14 @@ class quad_tree_obj{
 			return 5; // the ent is to large for the quad
 		}
 		
-		if(ent.x+cam.x < this.x+this.width/2){
-			if(ent.y+cam.y < this.y + this.height/2){
+		if(ent.pos.x+cam.x < this.x+this.width/2){
+			if(ent.pos.y+cam.y < this.y + this.height/2){
 				return 1;
 			}else{
 				return 2;
 			}
 		}else {
-			if(ent.y+cam.y < this.y + this.height/2){
+			if(ent.pos.y+cam.y < this.y + this.height/2){
 				return 3;
 			}else{
 				return 4;

@@ -10,8 +10,8 @@ class gridObj{
 		}
 	}
 	insert(ent){
-		var x = Math.ceil(ent.x/this.gridSize);
-		var y = Math.ceil(ent.y/this.gridSize);
+		var x = Math.ceil(ent.pos.x/this.gridSize);
+		var y = Math.ceil(ent.pos.y/this.gridSize);
 		
 		if( this.container[x] == undefined){ this.container[x]=[]; } 
 		if( this.container[x][y] == undefined){ this.container[x][y]=[]; }

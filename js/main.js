@@ -12,9 +12,8 @@ function init(){
 	
 	cam = new cameraObj();
 	
-	player = new entity({x:100, y:120, width:20, height:20, color: "purple"});
-	player.speed = 7;
- 	
+	pl = new player({x:100, y:120, width:20, height:20, color: "purple"});
+  	
 	keymap = [];
 
 	grid.insert(new entity({x:100, y:80, width:100, height:20, color: getRandomColor()}));
@@ -26,7 +25,7 @@ function loop(){ update(); render();}
 
 function update(){
 
-	player.resetDir();
+	pl.resetDir();
 
 	cam.updateEye();
 
@@ -36,79 +35,12 @@ function update(){
 		quadTree.insert(ent, cam); 
 	});
 
-	var ents = quadTree.get(player, cam);
-	
-	for(let i = 0; i < ents.quad.length; i++){ player.col(ents.quad[i], cam); }
-	for(let i = 0; i < ents.parent.length; i++){ player.col(ents.parent[i], cam); }	
+	var ents = quadTree.get(pl, cam);
+	for(let i = 0; i < ents.quad.length; i++){ pl.col(ents.quad[i], cam); }
+	for(let i = 0; i < ents.parent.length; i++){ pl.col(ents.parent[i], cam); }	
  
-	if(keymap['38']){//up
-		if(player.dir.top.canMove){
-			if(player.y <= cam.yMinDist){
-				cam.y+=(player.dir.top.maxMove == -1? player.speed : (player.speed<player.dir.top.maxMove ?  player.speed:player.dir.top.maxMove ));
-			}else{
-				player.y-=(player.dir.top.maxMove == -1? player.speed : (player.speed<player.dir.top.maxMove ?  player.speed:player.dir.top.maxMove ));
-			}
-
-		}
-	
-	}
-	if(keymap['40']){//down
-		if(player.dir.bottom.canMove){	
-			if(player.y+player.height >= cam.yMaxDist){
-				cam.y-=(player.dir.bottom.maxMove== -1? player.speed : (player.speed<player.dir.bottom.maxMove ?  player.speed:player.dir.bottom.maxMove ));
-			}else{
-				player.y+=(player.dir.bottom.maxMove== -1? player.speed : (player.speed<player.dir.bottom.maxMove ?  player.speed:player.dir.bottom.maxMove ));
-			}
-		}
-
-	}
-	if(keymap['37']){
-		player.acc.x = -0.5
-	}else if(keymap['39']){
-		player.acc.x = 0.5
-	}else{
-		//player.acc.x = player.acc.x * -1;
-		player.vel.x = player.acc.x = 0;
-	}
-	/*
-	if(keymap['37']){//left
-		if(player.dir.left.canMove){
-			if(player.x <= cam.xMinDist){
-				cam.x+=(player.dir.left.maxMove== -1? player.speed : (player.speed<player.dir.left.maxMove ?  player.speed:player.dir.left.maxMove ));
-			}else{
-				player.x-=(player.dir.left.maxMove== -1? player.speed : (player.speed<player.dir.left.maxMove ?  player.speed:player.dir.left.maxMove ));
-			}
-		}	
-
-	}
-	if(keymap['39']){//right	
-		if(player.dir.right.canMove){
-			if(player.x+player.width >= cam.xMaxDist){
-				cam.x-=(player.dir.right.maxMove== -1? player.speed : (player.speed<player.dir.right.maxMove ?  player.speed:player.dir.right.maxMove ));
-			}else{
-				player.x+=(player.dir.right.maxMove== -1? player.speed : (player.speed<player.dir.right.maxMove ?  player.speed:player.dir.right.maxMove ));
-			}
-		}
-
-	}
-	*/
-	
-	
-	player.vel.x += player.acc.x;
-	player.x += player.vel.x;
-	if(player.vel.x >player.vel.max){player.vel.x = player.vel.max;}
-	if(player.vel.x < -1 * player.vel.max){player.vel.x = -1 * player.vel.max;}
-	
-	debugBox( player.vel.x+" | "+player.acc.x+" | "+player.x,false); 
-	
-	/*
-	debugBox("Top | Bottom | Left | Right",false); 
-	debugBox(player.dir.top.maxMove+" | "+player.dir.bottom.maxMove+" | "+player.dir.left.maxMove+" | "+player.dir.right.maxMove,true);
-	debugBox(player.dir.top.canMove+" | "+player.dir.bottom.canMove+" | "+player.dir.left.canMove+" | "+player.dir.right.canMove,true);
-	debugBox("Cam.X | Cam.Y ",true);
-	debugBox(cam.x+" | "+cam.y,true);		
-	*/
-	
+	pl.actions(keymap);
+ 
 	requestAnimationFrame(this.loop.bind(this));
 }
 function render(){
@@ -117,16 +49,17 @@ function render(){
 	
 	//draws everything inside the cameras view
 	grid.loop(grid.get(cam.eye), cam.eye, function(ent){ 
+ 
  		ctx.fillStyle = ent.color; 
-		ctx.fillRect( (ent.x+cam.x), (ent.y+cam.y), ent.width, ent.height);
+		ctx.fillRect( (ent.pos.x+cam.x), (ent.pos.y+cam.y), ent.width, ent.height);
 		
 		ctx.font = "10px Arial";ctx.fillStyle = "#000000"; 
-		ctx.fillText("X{"+(ent.x)+"}--Y{"+(ent.y)+"}"+ent.id , (ent.x+cam.x), (ent.y+cam.y) );		
+		ctx.fillText("X{"+(ent.pos.x)+"}--Y{"+(ent.pos.y)+"}"+ent.id , (ent.pos.x+cam.x), (ent.pos.y+cam.y) );		
 	});
 
 	//draws player
-	//ctx.fillStyle = 'red'; ctx.fillRect(player.x-(24/2), player.y-(24/2), player.width+24, player.height+24);
-	ctx.fillStyle = player.color; ctx.fillRect(player.x, player.y, player.width, player.height);
+	//ctx.fillStyle = 'red'; ctx.fillRect(pl.x-(24/2), pl.y-(24/2), pl.width+24, pl.height+24);
+	ctx.fillStyle = pl.color; ctx.fillRect(pl.pos.x, pl.pos.y, pl.width, pl.height);
 
 	//draws a ghost box where if the mouse is clicked it will put a new box
 	if(debug.add){ 
@@ -137,6 +70,12 @@ function render(){
 	
 	//draws quad tree
 	if(debug.quadtree){ quadTree.draw(ctx); }	
+	
+	debugBox(pl.vel.x+" | "+pl.acc.x+" | "+pl.pos.x,false); 
+	debugBox(pl.vel.y+" | "+pl.acc.y+" | "+pl.pos.y,true);
+
+	debugBox(pl.coldir['top'].maxMove+" | "+pl.coldir['right'].maxMove+" | "+pl.coldir['bottom'].maxMove+" | "+pl.coldir['left'].maxMove,true);
+ 
 }
 
 function getRandomColor(){var letters = '0123456789ABCDEF'; var color = '#'; for (var i = 0; i < 6; i++) { color += letters[Math.floor(Math.random() * 16)]; } return color;}
@@ -180,4 +119,4 @@ window.onload = function(){
  	init();
 	createEvents();
 };
-
+ 
